@@ -1,0 +1,150 @@
+<div class="container">
+
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-logo">__LOGO__</div>
+      <div class="header-meta">
+        <div class="eyebrow">THERAPY+ DIVISION</div>
+        <div class="tool-name">Financial Performance Tool</div>
+      </div>
+    </div>
+    <div class="brand-bar"><span class="bb-orange"></span><span class="bb-green"></span><span class="bb-teal"></span><span class="bb-purple"></span></div>
+  </div>
+
+  <div class="title-block">
+    <div class="page-title">Revenue, Profitability &amp; Volume</div>
+    <div class="page-subtitle">Period-over-period comparison by service line and, for the Therapy line of business, by state</div>
+    <div class="data-tag">Data: __DATA_TAG__</div>
+  </div>
+
+
+  <div class="load-panel" id="loadPanel">
+    <div class="load-bar" onclick="toggleLoadPanel()">
+      <span class="load-title">Load a month from the P&amp;L pack</span>
+      <span class="store-badge" id="storeBadge" title="Checking for shared storage">Checking</span>
+      <span class="load-tag" id="loadedTag"></span>
+      <span class="load-caret">▾</span>
+    </div>
+    <div class="load-body">
+      <div class="drop-zone" id="dropZone">
+        <div><strong>Drop the monthly workbooks here</strong> (department P&amp;Ls plus Budget to Actuals), or <label class="link" for="fileInput">choose files</label>.</div>
+        <div class="picker-hint">The page reads the Total and state columns itself, shows the reconciled figures for review, then adds the month. Nothing leaves your browser.</div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" multiple hidden>
+        <div class="load-status" id="loadStatus"></div>
+      </div>
+      <div id="loadReview"></div>
+      <div class="load-footer">
+        <button class="btn btn-ghost chip-btn" onclick="exportDataCsv()">Download all months as CSV</button>
+        <button class="btn btn-ghost chip-btn" onclick="clearLoadedMonths()">Remove a loaded month</button>
+        <span class="picker-hint">On the hosted site (badge reads Shared) a loaded month is saved for everyone with the link. Opened as a local file it stays in this browser. The CSV download gives the refresh kit layout if you ever want to bake months into the page.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="control-block">
+      <div class="control-label">Periods to compare</div>
+      <div class="preset-row" id="presetRow">
+        <button class="toggle-btn" data-preset="latest" onclick="applyPreset('latest')">Latest month vs prior vs last year</button>
+        <button class="toggle-btn" data-preset="ytd" onclick="applyPreset('ytd')">YTD vs prior YTD</button>
+        <button class="toggle-btn" data-preset="t12" onclick="applyPreset('t12')">Trailing 12 vs prior 12</button>
+        <button class="toggle-btn" data-preset="qtr" onclick="applyPreset('qtr')">Quarter vs last year</button>
+      </div>
+      <div class="picker-row" id="pickerRow" style="margin-top:10px"></div>
+      <div class="picker-hint">Pick 2 to 4 single months, or use a preset above for aggregated periods.</div>
+    </div>
+
+    <div class="control-block">
+      <div class="control-label">Break out by</div>
+      <div class="toggle-row">
+        <button class="toggle-btn active" id="modeLine" onclick="setMode('line')">Service line</button>
+        <button class="toggle-btn" id="modeState" onclick="setMode('state')">State (Therapy OT / PT / SLP only)</button>
+      </div>
+    </div>
+
+    <div class="control-block" id="lineBlock">
+      <div class="control-label">Service lines (filter what's shown)</div>
+      <div class="chip-row">
+        <span class="chip active" data-line="aba" onclick="toggleLine('aba')"><span class="chip-check"></span>ABA Therapy</span>
+        <span class="chip active" data-line="therapy" onclick="toggleLine('therapy')"><span class="chip-check"></span>Therapy (OT / PT / SLP)</span>
+        <span class="chip active" data-line="sbs" onclick="toggleLine('sbs')"><span class="chip-check"></span>School Based Services</span>
+        <span class="chip active" data-line="other" onclick="toggleLine('other')"><span class="chip-check"></span>Other Services</span>
+        <button class="btn btn-ghost chip-btn" onclick="setAllLines(true)">All</button>
+        <button class="btn btn-ghost chip-btn" onclick="setAllLines(false)">None</button>
+      </div>
+    </div>
+
+    <div class="control-block" id="stateBlock" style="display:none">
+      <div class="control-label">States (filter what's shown)</div>
+      <div class="chip-row">
+        <span class="chip active" data-state="CO" onclick="toggleState('CO')"><span class="chip-check"></span>Colorado</span>
+        <span class="chip active" data-state="TX" onclick="toggleState('TX')"><span class="chip-check"></span>Texas</span>
+        <span class="chip active" data-state="AZ" onclick="toggleState('AZ')"><span class="chip-check"></span>Arizona</span>
+        <span class="chip active" data-state="NV_ID" onclick="toggleState('NV_ID')"><span class="chip-check"></span>Nevada / Idaho</span>
+        <button class="btn btn-ghost chip-btn" onclick="setAllStates(true)">All</button>
+        <button class="btn btn-ghost chip-btn" onclick="setAllStates(false)">None</button>
+      </div>
+    </div>
+
+    <div class="control-block">
+      <div class="control-label">View</div>
+      <div class="toggle-row">
+        <button class="toggle-btn active" id="viewSummary" onclick="setView('summary')">Summary</button>
+        <button class="toggle-btn" id="viewDetail" onclick="setView('detail')">Detail</button>
+        <button class="toggle-btn" id="viewTrend" onclick="setView('trend')">Trend</button>
+        <button class="toggle-btn" id="viewYoy" onclick="setView('yoy')">Year over Year</button>
+        <button class="toggle-btn" id="viewWow" onclick="setView('wow')">Week over Week</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scopeBanner"></div>
+
+  <div class="chart-card" id="chartCard" style="display:none">
+    <div class="chart-header chart-header-row">
+      <div>
+        <div class="chart-title" id="chartTitle"></div>
+        <div class="chart-subtitle" id="chartSubtitle"></div>
+      </div>
+      <div class="chart-controls">
+        <select class="month-select metric-select" id="metricSelect" onchange="render()">
+          <option value="rev">Revenue</option>
+          <option value="gp">Gross Profit</option>
+          <option value="gm">Gross Margin %</option>
+          <option value="ebitda">EBITDA</option>
+          <option value="ebitda_margin">EBITDA Margin %</option>
+          <option value="vol">Volume (visits / hours)</option>
+          <option value="rpu">Revenue per Visit / Hour</option>
+        </select>
+        <div class="toggle-row" id="chartTypeToggle">
+          <button class="toggle-btn small active" id="typeLine" onclick="setChartType('line')">Line</button>
+          <button class="toggle-btn small" id="typeBar" onclick="setChartType('bar')">Bars</button>
+        </div>
+        <select class="month-select metric-select" id="weeksSelect" onchange="render()" style="min-width:130px">
+          <option value="13">Last 13 weeks</option>
+          <option value="26" selected>Last 26 weeks</option>
+          <option value="52">Last 52 weeks</option>
+          <option value="all">All weeks</option>
+        </select>
+        <div class="toggle-row" id="rangeToggle">
+          <button class="toggle-btn small active" id="rangePicker" onclick="setRange('picker')">Picker range</button>
+          <button class="toggle-btn small" id="rangeAll" onclick="setRange('all')">All months</button>
+        </div>
+      </div>
+    </div>
+    <div id="chartArea"></div>
+  </div>
+
+  <div class="compare" id="compareCard"></div>
+
+  <div class="footer">
+    <div class="footer-bar"></div>
+    <div class="footer-content">
+      <span class="footer-brand">CARE OPTIONS FOR KIDS &nbsp;·&nbsp; THERAPY+ DIVISION</span> &nbsp;·&nbsp; Internal use only<br>
+      Source: COFK Income Statement by Dpt w EBITDA (Therapy+), department and state P&amp;Ls; Platform KPI Master (Therapy visits); Budget to Actuals (ABA and SBS hours).<br>
+      Definitions: EBITDA is net income plus depreciation, amortization and interest (addbacks are not included). Consolidated EBITDA and net income include division allocations; state figures use the state columns only, so state sums will not equal the consolidated total. ABA and SBS are not allocated to states.<br>
+      Notes: "Other Services" was stripped from financials after Jan 2024 and most likely folded into Therapy. State detail begins Jan 2024; state visits begin Jan 2026; ABA and SBS hours begin Jan 2026. Nevada / Idaho began operations June 2025 and is reported as a combined region. State revenue sums run within 0.16% of consolidated for Feb to Apr 2026 (late posting adjustments). SBS posts no revenue in July.
+    </div>
+  </div>
+
+</div>

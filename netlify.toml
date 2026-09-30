@@ -1,0 +1,17 @@
+[build]
+  publish = "build"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/months"
+  to = "/.netlify/functions/months"
+  status = 200
+  force = false
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
